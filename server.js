@@ -57,6 +57,12 @@ function filterByQuery(query, animalsArray){
     return filteredResults;
 }
 
+
+function findByID(id, animalsArray){
+    const result = animalsArray.filter(animal => animal.id === id)[0];
+    return result;
+}
+
 app.get('/api/animals', (req, res) => {
     // assign animals array to results
     let results = animals;
@@ -64,4 +70,19 @@ app.get('/api/animals', (req, res) => {
         results = filterByQuery(req.query, results);
     }
     res.json(results);
+});
+
+// we have to pay attention to the order of the routes. A param route must come after
+// the other GET route.
+// req.query is multifaceted, often combining multiple parameters,
+// req.param is specific to a single property, often to retrieve a single record.
+app.get('/api/animals/:id', (req, res) => {
+    const result = findByID(req.params.id, animals);
+    if(result){
+        res.json(result);
+
+    }else{
+        res.send(404);
+    }
+  
 });
