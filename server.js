@@ -1,6 +1,28 @@
+const { create } = require('domain');
 const express = require('express');
+const { type } = require('express/lib/response');
+const fs = require('fs');
+const path = require('path'); // provides utilities for working with file and directory paths
 const PORT = process.env.PORT || 3001;
 const app = express();
+
+// parse incoming string or array data
+
+app.use(express.urlencoded({extended: true}));
+// parse incoming JSON data
+app.use(express.json());
+
+// express.urlencoded({extended: true}) method is a method built into
+// Express.js. It takes incoming POST data and converts it to key/value paring
+// that can be accessed in the req.body object. The extended: true option set inside
+// the method call informs our server that there may be sub-array data nested in it as well,so 
+// it needs to look as deep into the POST data as possible to parse all of the data correctly.
+// express.json() method takes incoming POST data in the form of JSON and pareses it
+// into the req.body Javascript object. Both of the above middleware functions need to be set up
+// everytime you create a server that's looking to accept POST data.
+
+
+
 const {animals} = require('./data/animals.json');
 
 app.listen(PORT, () => {
@@ -63,6 +85,52 @@ function findByID(id, animalsArray){
     return result;
 }
 
+function createNewAnimal(body, animalsArray){
+    console.log(body);
+    const animal = body;
+    // our function's main code will go here!
+    animalsArray.push(animal)
+
+    // writeFileSync is a synchronous version of writeFile() and doesn't require
+    // callback funtion. If we were to write to a much larger data set, the asynchronous
+    // version would be better.
+    fs.writeFileSync(
+       
+    // path.join() to join the value of __dirname, which represents the directory
+    // of the file we execute the code in, with the path to the animal.json file
+    path.join(__dirname, './data/animals.json'),
+    // save the JavaScript array data as JSON
+    // null argument means we don't want to edit any of our existing data
+    // 2 indicates we want to create white space between our values to make it more readable
+    JSON.stringify({animals: animalsArray}, null, 2)
+    );
+    
+
+
+    // return finished code to post route for response
+    return animal;
+}
+
+function validateAnimal(animal){
+    if(!animal.name || typeof animal.name != 'string'){
+        return false;
+    }
+
+    if(!animal.species || typeof animal.species != 'string'){
+        return false;
+    }
+
+    if(!animal.diet || typeof animal.diet != 'string'){
+        return false;
+    }
+
+    if(!animal.personalityTraits || !Array.isArray(animal.personalityTraits != 'string')){
+        return false;
+    }
+
+    return true;
+}
+
 app.get('/api/animals', (req, res) => {
     // assign animals array to results
     let results = animals;
@@ -85,4 +153,26 @@ app.get('/api/animals/:id', (req, res) => {
         res.send(404);
     }
   
+});
+
+app.post('/api/animals', (req, res) => {
+    // req.body is where our incoming content will be
+    console.log(req.body);
+
+    // set id based on what the next index of the array will be
+    req.body.id = animals.length.toString();
+
+
+    // if any data in req.boyd is incorrect, send 400 error back
+    if(!validateAnimal(req.body)){
+        res.status(400).send('The animal is not properly formattted.');
+    }else{
+  
+
+         // add animal to json file and animal's array in this function
+        const animal = createNewAnimal(req.body, animals);
+
+        res.json(animal);
+    }
+   
 });
