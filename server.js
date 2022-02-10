@@ -3,6 +3,8 @@ const express = require('express');
 const { type } = require('express/lib/response');
 const fs = require('fs');
 const path = require('path'); // provides utilities for working with file and directory paths
+
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -11,6 +13,11 @@ const app = express();
 app.use(express.urlencoded({extended: true}));
 // parse incoming JSON data
 app.use(express.json());
+// we added middleware to our server and used express.static() method. The way
+// it works is taht we provide a file path to a location in our application public foler
+// and instruct the server to make these files staic resources. This means that all
+// our front-end code can now be accessed without having a specific server endpoint created for it
+app.use(express.static('public'));
 
 // express.urlencoded({extended: true}) method is a method built into
 // Express.js. It takes incoming POST data and converts it to key/value paring
@@ -25,9 +32,7 @@ app.use(express.json());
 
 const {animals} = require('./data/animals.json');
 
-app.listen(PORT, () => {
-    console.log(`API server now on port ${PORT}!`);
-});
+
 
 function filterByQuery(query, animalsArray){
     let personalityTraitsArray = []
@@ -175,4 +180,25 @@ app.post('/api/animals', (req, res) => {
         res.json(animal);
     }
    
+});
+
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+})
+
+app.get('/animals', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+app.get('/zookeepers', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`API server now on port ${PORT}!`);
 });
