@@ -117,15 +117,6 @@
         "hungry"
       ],
       "id": "11"
-    },
-    {
-      "name": "sss",
-      "species": "sa",
-      "diet": "herbivore",
-      "personalityTraits": [
-        "hungry"
-      ],
-      "id": "12"
     }
   ]
 }
