@@ -1,4 +1,5 @@
 const $animalForm = document.querySelector('#animal-form');
+const $zookeeperForm = document.querySelector('#zookeeper-form');
 
 const handleAnimalFormSubmit = event => {
   event.preventDefault();
@@ -25,31 +26,27 @@ const handleAnimalFormSubmit = event => {
     personalityTraits.push(selectedTraits[i].value);
   }
   const animalObject = { name, species, diet, personalityTraits };
-  
 
-
-
-  // when we submit a new animal through the form, we collect all the input data
-  // into an object and use fetch() to POST our data to the server.
+    // when we submit a new animal through the form, we collect all the input data
+    // into an object and use fetch() to POST our data to the server.
   fetch('/api/animals', {
-      method: 'POST',
-      headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(animalObject)
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(animalObject)
   })
-  .then(response => {
-      if(response.ok){
-          return response.json();
+    .then(response => {
+      if (response.ok) {
+        return response.json();
       }
       alert(`Error: ${response.statusText}`);
-  })
-  .then(postResponse => {
+    })
+    .then(postResponse => {
       console.log(postResponse);
-      alert("Thank you for adding an animal!");
-  });
-
+      alert('Thank you for adding an animal!');
+    });
 };
 
 $animalForm.addEventListener('submit', handleAnimalFormSubmit);
